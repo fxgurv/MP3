@@ -105,7 +105,6 @@ def main():
                     youtube.generate_video(tts)
                     # youtube.upload_video()
                     save_short(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'])
-                    upload_youtube_using_selenium(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'])
                     niche = get_niche()
                 return
     elif user_input == 2:
