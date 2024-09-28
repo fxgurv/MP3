@@ -15,15 +15,9 @@ from constants import *
 from typing import List
 from moviepy.editor import *
 from termcolor import colored
-# from selenium_firefox import *
-# from selenium import webdriver
 from moviepy.video.fx.all import crop
 from moviepy.config import change_settings
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.chrome.service import Service
-# from selenium.webdriver.chrome.options import Options
 from moviepy.video.tools.subtitles import SubtitlesClip
-# from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 from .GeneratorImg import Generation
 
