@@ -2,17 +2,20 @@ import re
 import g4f
 import json
 import time
+import math
+import numpy
 import requests
-import assemblyai as aai
-
 from utils import *
 from cache import *
 from .Tts import TTS
 from config import *
 from status import *
+from PIL import Image
 from uuid import uuid4
 from constants import *
 from typing import List
+import assemblyai as aai
+import moviepy.editor as mp
 from moviepy.editor import *
 from termcolor import colored
 from moviepy.video.fx.all import crop
@@ -20,43 +23,10 @@ from moviepy.config import change_settings
 from moviepy.video.tools.subtitles import SubtitlesClip
 from datetime import datetime
 from .GeneratorImg import Generation
-
-
-import moviepy.editor as mp
 import math
-from PIL import Image
-import numpy
+from .BingImagesFetcher import BingImagesFetcher
+fetcher_img = BingImagesFetcher()
 from save_short import save_image
-
-def zoom_in_effect(clip, zoom_ratio=0.04):
-    def effect(get_frame, t):
-        img = Image.fromarray(get_frame(t))
-        base_size = img.size
-
-        new_size = [
-            math.ceil(img.size[0] * (1 + (zoom_ratio * t))),
-            math.ceil(img.size[1] * (1 + (zoom_ratio * t)))
-        ]
-
-        # The new dimensions must be even.
-        new_size[0] = new_size[0] + (new_size[0] % 2)
-        new_size[1] = new_size[1] + (new_size[1] % 2)
-
-        img = img.resize(new_size, Image.LANCZOS)
-
-        x = math.ceil((new_size[0] - base_size[0]) / 2)
-        y = math.ceil((new_size[1] - base_size[1]) / 2)
-
-        img = img.crop([
-            x, y, new_size[0] - x, new_size[1] - y
-        ]).resize(base_size, Image.LANCZOS)
-
-        result = numpy.array(img)
-        img.close()
-
-        return result
-
-    return clip.fl(effect)
 
 mygenerator = Generation()
 
@@ -89,10 +59,6 @@ def remove_g4f_finish_reason(input_str):
     cleaned_text = re.sub(pattern, '', test_str)
     return cleaned_text
 
-import math
-# from .BingImagesFetcher import BingImagesFetcher
-
-# fetcher_img = BingImagesFetcher()
 
 class YouTube:
     """
@@ -130,17 +96,7 @@ class YouTube:
 
         self.images = []
 
-        # Initialize the Firefox profile
-        # self.options: Options = Options()
-        
-        # self.options.add_argument('--headless')
-        # self.options.add_argument('--no-sandbox')
-        # self.options.add_argument('--disable-dev-shm-usage')
-
-        # self.service: Service = Service(ChromeDriverManager().install())
-
-        # self.browser: webdriver.Chrome = webdriver.Chrome(service=self.service, options=self.options)
-
+    
     @property
     def niche(self) -> str:
         """
@@ -522,6 +478,29 @@ class YouTube:
 
         return srt_path
 
+def zoom_in_effect(clip, zoom_ratio=0.04):
+    def effect(get_frame, t):
+        img = Image.fromarray(get_frame(t))
+        base_size = img.size
+        new_size = [
+            math.ceil(img.size[0] * (1 + (zoom_ratio * t))),
+            math.ceil(img.size[1] * (1 + (zoom_ratio * t)))
+        ]
+        # The new dimensions must be even.
+        new_size[0] = new_size[0] + (new_size[0] % 2)
+        new_size[1] = new_size[1] + (new_size[1] % 2)
+        img = img.resize(new_size, Image.LANCZOS)
+        x = math.ceil((new_size[0] - base_size[0]) / 2)
+        y = math.ceil((new_size[1] - base_size[1]) / 2)
+        img = img.crop([
+            x, y, new_size[0] - x, new_size[1] - y
+        ]).resize(base_size, Image.LANCZOS)
+        result = numpy.array(img)
+        img.close()
+        return result
+    return clip.fl(effect)
+    
+
     def combine(self) -> str:
         """
         Combines everything into the final video.
@@ -708,164 +687,9 @@ class YouTube:
         return path
     
     def get_channel_id(self) -> str:
-        """
-        Gets the Channel ID of the YouTube Account.
-
-        Returns:
-            channel_id (str): The Channel ID.
-        """
-        # driver = self.browser
-        # driver.get("https://studio.youtube.com")
-        # time.sleep(2)
-        # channel_id = driver.current_url.split("/")[-1]
-        # self.channel_id = channel_id
-
-        # return channel_id
         return None
 
     def upload_video(self) -> bool:
-        """
-        Uploads the video to YouTube.
-
-        Returns:
-            success (bool): Whether the upload was successful or not.
-        """
-        # try:
-        #     self.get_channel_id()
-
-        #     driver = self.browser
-        #     verbose = get_verbose()
-
-        #     # Go to youtube.com/upload
-        #     driver.get("https://www.youtube.com/upload")
-
-        #     # Set video file
-        #     FILE_PICKER_TAG = "ytcp-uploads-file-picker"
-        #     file_picker = driver.find_element(By.TAG_NAME, FILE_PICKER_TAG)
-        #     INPUT_TAG = "input"
-        #     file_input = file_picker.find_element(By.TAG_NAME, INPUT_TAG)
-        #     file_input.send_keys(self.video_path)
-
-        #     # Wait for upload to finish
-        #     time.sleep(5)
-
-        #     # Set title
-        #     textboxes = driver.find_elements(By.ID, YOUTUBE_TEXTBOX_ID)
-
-        #     title_el = textboxes[0]
-        #     description_el = textboxes[-1]
-
-        #     if verbose:
-        #         info("\t=> Setting title...")
-
-        #     title_el.click()
-        #     time.sleep(1)
-        #     title_el.clear()
-        #     title_el.send_keys(self.metadata["title"])
-
-        #     if verbose:
-        #         info("\t=> Setting description...")
-
-        #     # Set description
-        #     time.sleep(10)
-        #     description_el.click()
-        #     time.sleep(0.5)
-        #     description_el.clear()
-        #     description_el.send_keys(self.metadata["description"])
-
-        #     time.sleep(0.5)
-
-        #     # Set `made for kids` option
-        #     if verbose:
-        #         info("\t=> Setting `made for kids` option...")
-
-        #     is_for_kids_checkbox = driver.find_element(By.NAME, YOUTUBE_MADE_FOR_KIDS_NAME)
-        #     is_not_for_kids_checkbox = driver.find_element(By.NAME, YOUTUBE_NOT_MADE_FOR_KIDS_NAME)
-
-        #     if not get_is_for_kids():
-        #         is_not_for_kids_checkbox.click()
-        #     else:
-        #         is_for_kids_checkbox.click()
-
-        #     time.sleep(0.5)
-
-        #     # Click next
-        #     if verbose:
-        #         info("\t=> Clicking next...")
-
-        #     next_button = driver.find_element(By.ID, YOUTUBE_NEXT_BUTTON_ID)
-        #     next_button.click()
-
-        #     # Click next again
-        #     if verbose:
-        #         info("\t=> Clicking next again...")
-        #     next_button = driver.find_element(By.ID, YOUTUBE_NEXT_BUTTON_ID)
-        #     next_button.click()
-
-        #     # Wait for 2 seconds
-        #     time.sleep(2)
-
-        #     # Click next again
-        #     if verbose:
-        #         info("\t=> Clicking next again...")
-        #     next_button = driver.find_element(By.ID, YOUTUBE_NEXT_BUTTON_ID)
-        #     next_button.click()
-
-        #     # Set as unlisted
-        #     if verbose:
-        #         info("\t=> Setting as unlisted...")
-            
-        #     radio_button = driver.find_elements(By.XPATH, YOUTUBE_RADIO_BUTTON_XPATH)
-        #     radio_button[2].click()
-
-        #     if verbose:
-        #         info("\t=> Clicking done button...")
-
-        #     # Click done button
-        #     done_button = driver.find_element(By.ID, YOUTUBE_DONE_BUTTON_ID)
-        #     done_button.click()
-
-        #     # Wait for 2 seconds
-        #     time.sleep(2)
-
-        #     # Get latest video
-        #     if verbose:
-        #         info("\t=> Getting video URL...")
-
-        #     # Get the latest uploaded video URL
-        #     driver.get(f"https://studio.youtube.com/channel/{self.channel_id}/videos/short")
-        #     time.sleep(2)
-        #     videos = driver.find_elements(By.TAG_NAME, "ytcp-video-row")
-        #     first_video = videos[0]
-        #     anchor_tag = first_video.find_element(By.TAG_NAME, "a")
-        #     href = anchor_tag.get_attribute("href")
-        #     if verbose:
-        #         info(f"\t=> Extracting video ID from URL: {href}")
-        #     video_id = href.split("/")[-2]
-
-        #     # Build URL
-        #     url = build_url(video_id)
-
-        #     self.uploaded_video_url = url
-
-        #     if verbose:
-        #         success(f" => Uploaded Video: {url}")
-
-        #     # Add video to cache
-        #     self.add_video({
-        #         "title": self.metadata["title"],
-        #         "description": self.metadata["description"],
-        #         "url": url,
-        #         "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #     })
-
-        #     # Close the browser
-        #     driver.quit()
-
-        #     return True
-        # except:
-        #     self.browser.quit()
-        #     return False
         return False
 
 
