@@ -1,6 +1,5 @@
 # RUN THIS N AMOUNT OF TIMES
 import sys
-
 from status import *
 from cache import get_accounts
 from config import get_verbose
