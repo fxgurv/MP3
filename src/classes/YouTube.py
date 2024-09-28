@@ -63,26 +63,8 @@ mygenerator = Generation()
 # Set ImageMagick Path
 change_settings({"IMAGEMAGICK_BINARY": get_imagemagick_path()})
 
-def get_segments(input_str):
-    regex = r"{ \"(.|\n)*"
-    test_str = input_str
-    matches = re.finditer(regex, test_str, re.MULTILINE)
-    match_end = match_start = 0
-    for matchNum, match in enumerate(matches, start=1):
-        
-        print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
-        match_start = match.start()
-        match_end = match.end()
-        for groupNum in range(0, len(match.groups())):
-            groupNum = groupNum + 1
-            
-            print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
-    if match_end != match_start != 0:
-        test_str = test_str[match_start:match_end]
-        print('test_str after edit: ', test_str)
-    return test_str
 
-def remove_g4f_finishreason(input_str):
+def remove_g4f_finish_reason(input_str):
     regex = r"<g4f.*"
 
     test_str = input_str
@@ -204,7 +186,7 @@ class YouTube:
                 ]
             )
             print('chat response: ', response)
-            return remove_g4f_finishreason(response)
+            return remove_g4f_finish_reason(response)
         else:
             response = g4f.ChatCompletion.create(
                 model=model,
@@ -216,7 +198,7 @@ class YouTube:
                 ]
             )
             print('chat response: ', response)
-            return remove_g4f_finishreason(response)
+            return remove_g4f_finish_reason(response)
 
     def generate_topic(self) -> str:
         """
@@ -350,7 +332,7 @@ class YouTube:
             .replace("```json", "") \
             .replace("```", "")
 
-        # completion = remove_g4f_finishreason(completion)
+        # completion = remove_g4f_finish_reason(completion)
         image_prompts = []
         print('completion generate_prompts: ', completion)
         # completion = re.sub(r'[^\w\s.?!]', '', completion)
