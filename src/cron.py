@@ -54,7 +54,7 @@ def main():
                     acc["language"]
                 )
                 youtube.generate_video(tts)
-                # youtube.upload_video()
+                upload_youtube_using_selenium(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'])
                 if verbose:
                     success("Uploaded Short.")
                 break
