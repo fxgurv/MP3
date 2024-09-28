@@ -4,6 +4,7 @@ import json
 import time
 import math
 import numpy
+import math
 import requests
 from utils import *
 from cache import *
@@ -17,16 +18,17 @@ from typing import List
 import assemblyai as aai
 import moviepy.editor as mp
 from moviepy.editor import *
-from termcolor import colored
-from moviepy.video.fx.all import crop
-from moviepy.config import change_settings
-from moviepy.video.tools.subtitles import SubtitlesClip
 from datetime import datetime
-from .GeneratorImg import Generation
-import math
-from .BingImagesFetcher import BingImagesFetcher
+from termcolor import colored
 fetcher_img = BingImagesFetcher()
 from save_short import save_image
+from .GeneratorImg import Generation
+from moviepy.video.fx.all import crop
+from moviepy.config import change_settings
+from .BingImagesFetcher import BingImagesFetcher
+from moviepy.video.tools.subtitles import SubtitlesClip
+
+
 
 mygenerator = Generation()
 
@@ -53,41 +55,13 @@ def remove_g4f_finish_reason(input_str):
     if match_end != match_start != 0:
         test_str = test_str[:match_start]
         print('test_str after edit: ', test_str)
-    # Solve encrypt
-    # test_str = re.sub(r'[^\w\s.?!]', '', test_str)
     pattern = r'\$\@\$(v=v\d+\.\d+-rv\d+|v=undefined-rv\d+)\$\@\$(.*?)'
     cleaned_text = re.sub(pattern, '', test_str)
     return cleaned_text
 
 
 class YouTube:
-    """
-    Class for YouTube Automation.
-
-    Steps to create a YouTube Short:
-    1. Generate a topic [DONE]
-    2. Generate a script [DONE]
-    3. Generate metadata (Title, Description, Tags) [DONE]
-    4. Generate AI Image Prompts [DONE]
-    4. Generate Images based on generated Prompts [DONE]
-    5. Convert Text-to-Speech [DONE]
-    6. Show images each for n seconds, n: Duration of TTS / Amount of images [DONE]
-    7. Combine Concatenated Images with the Text-to-Speech [DONE]
-    """
     def __init__(self, account_uuid: str, account_nickname: str, fp_profile_path: str, niche: str, language: str) -> None:
-        """
-        Constructor for YouTube Class.
-
-        Args:
-            account_uuid (str): The unique identifier for the YouTube account.
-            account_nickname (str): The nickname for the YouTube account.
-            fp_profile_path (str): Path to the firefox profile that is logged into the specificed YouTube Account.
-            niche (str): The niche of the provided YouTube Channel.
-            language (str): The language of the Automation.
-
-        Returns:
-            None
-        """
         self._account_uuid: str = account_uuid
         self._account_nickname: str = account_nickname
         self._fp_profile_path: str = fp_profile_path
