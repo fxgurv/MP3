@@ -1,6 +1,5 @@
 import schedule
 import subprocess
-
 from art import *
 from cache import *
 from utils import *
@@ -15,9 +14,8 @@ from classes.YouTube import YouTube
 from prettytable import PrettyTable
 from classes.Outreach import Outreach
 from classes.AFM import AffiliateMarketing
-# from upload_youtube import upload_video
 from save_short import save_short
-# from upload_youtube_sele import upload_youtube_using_selenium
+from uploader import upload_youtube_using_selenium
 
 def main():
 
@@ -99,7 +97,6 @@ def main():
                         selected_account["id"],
                         selected_account["nickname"],
                         selected_account["firefox_profile"],
-                        # selected_account["niche"],
                         niche,
                         selected_account["language"]
                     )
@@ -108,8 +105,7 @@ def main():
                     youtube.generate_video(tts)
                     # youtube.upload_video()
                     save_short(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'])
-                    # upload_video(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'], "22", "", "public")
-                    # upload_youtube_using_selenium(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'])
+                    upload_youtube_using_selenium(youtube.video_path, youtube.metadata['title'], youtube.metadata['description'])
                     niche = get_niche()
                 return
     elif user_input == 2:
