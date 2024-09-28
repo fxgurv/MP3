@@ -7,6 +7,15 @@ import pyperclip
 import time
 from config import get_user_data
 import os, shutil
+from selenium_firefox import *
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+
+
+
 
 def upload_youtube_using_selenium(video_path, title, description):
   options = webdriver.ChromeOptions()
