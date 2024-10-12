@@ -21,7 +21,7 @@
                              min_size=(400, 400), max_size=None)
         
          chosen_image = random.choice([tmp_root_dir + image_file for image_file in os.listdir(tmp_root_dir)])
-#         # image_clip = ImageClip(chosen_image)
-#         # os.remove(chosen_image)
+         image_clip = ImageClip(chosen_image)
+         os.remove(chosen_image)
 
-#         return chosen_image
+         return chosen_image
